@@ -21,11 +21,9 @@ export const PokemonCard = ({ pokemon, onClick }: PokemonCardProps) => {
       </div>
 
       {spriteUrl && (
-        <img
-          src={spriteUrl}
-          alt={pokemon.name}
-          className="pokemon-card-sprite"
-        />
+        <div className="pokemon-card-sprite">
+          <img src={spriteUrl} alt={pokemon.name} />
+        </div>
       )}
 
       <h3 className="pokemon-card-name">
