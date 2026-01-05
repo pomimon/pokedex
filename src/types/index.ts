@@ -4,5 +4,9 @@ export type {
   PokemonSprites,
   PokemonType,
   PokemonDetail,
+  PokemonSpecies,
+  EvolutionChain,
+  EvolutionChainLink,
+  EvolutionChainSpecies,
   FetchState,
 } from "./pokemon";
