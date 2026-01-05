@@ -27,15 +27,12 @@ export const PokemonDetailsModal = ({
     };
   }, [pokemon]);
 
-  // Fetch species data (includes flavor text and evolution chain URL)
   const { data: speciesData } = usePokemonSpecies(pokemon?.species.url || null);
 
-  // Fetch evolution chain data
   const { data: evolutionData } = useEvolutionChain(
     speciesData?.evolution_chain.url || null,
   );
 
-  // Extract English flavor text
   const flavorText = useMemo(() => {
     if (!speciesData?.flavor_text_entries) return null;
 
@@ -46,14 +43,12 @@ export const PokemonDetailsModal = ({
     return englishEntry?.flavor_text.replace(/\f/g, " ") || null;
   }, [speciesData]);
 
-  // Flatten evolution chain into array of species with name and ID
   const evolutionChain = useMemo(() => {
     if (!evolutionData) return [];
 
     const flattenChain = (
       chain: EvolutionChainLink,
     ): Array<{ name: string; id: number }> => {
-      // Extract ID from species URL (format: https://pokeapi.co/api/v2/pokemon-species/{id}/)
       const idMatch = chain.species.url.match(/\/(\d+)\//);
       const id = idMatch && idMatch[1] ? parseInt(idMatch[1], 10) : 0;
 
@@ -71,7 +66,6 @@ export const PokemonDetailsModal = ({
     return null;
   }
 
-  // Use animated GIF sprite
   const spriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${pokemon.id}.gif`;
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
