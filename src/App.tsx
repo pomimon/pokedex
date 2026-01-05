@@ -1,14 +1,14 @@
-import "./index.css";
-
-export function App() {
+export const App = () => {
   return (
     <div className="app">
-      <h1>Bun + React</h1>
-      <p>
-        Edit <code>src/App.tsx</code> and save to test HMR
-      </p>
+      <header>
+        <h1>Pokédex</h1>
+      </header>
+      <main>
+        <p>Pokédex loading…</p>
+      </main>
     </div>
   );
-}
+};
 
 export default App;
