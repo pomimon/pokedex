@@ -41,6 +41,60 @@ export type PokemonDetail = {
   height: number;
   weight: number;
   base_experience: number;
+  species: {
+    name: string;
+    url: string;
+  };
+};
+
+/**
+ * Pokémon Species Data
+ * Contains flavor text and evolution chain information
+ */
+export type PokemonSpecies = {
+  id: number;
+  name: string;
+  flavor_text_entries: Array<{
+    flavor_text: string;
+    language: {
+      name: string;
+      url: string;
+    };
+    version: {
+      name: string;
+      url: string;
+    };
+  }>;
+  evolution_chain: {
+    url: string;
+  };
+};
+
+/**
+ * Evolution Chain Species
+ * Represents a single Pokémon in the evolution chain
+ */
+export type EvolutionChainSpecies = {
+  name: string;
+  url: string;
+};
+
+/**
+ * Evolution Chain Link
+ * Represents one stage in the evolution chain
+ */
+export type EvolutionChainLink = {
+  species: EvolutionChainSpecies;
+  evolves_to: EvolutionChainLink[];
+};
+
+/**
+ * Evolution Chain Data
+ * Complete evolution chain from PokéAPI
+ */
+export type EvolutionChain = {
+  id: number;
+  chain: EvolutionChainLink;
 };
 
 export type FetchState<T> = {
