@@ -1,5 +1,6 @@
 import { PokemonTypeBadge } from "./PokemonTypeBadge";
 import type { PokemonDetail } from "../types";
+import { getSpriteUrl, formatId, formatName } from "../utils";
 
 type PokemonCardProps = {
   pokemon: PokemonDetail;
@@ -12,23 +13,19 @@ export const PokemonCard = ({ pokemon, onClick }: PokemonCardProps) => {
   };
 
   // Use animated GIF sprite
-  const spriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${pokemon.id}.gif`;
+  const spriteUrl = getSpriteUrl(pokemon.id);
 
   return (
     <div className="pokemon-card" onClick={handleClick}>
-      <div className="pokemon-card-number">
-        #{pokemon.id.toString().padStart(3, "0")}
-      </div>
+      <div className="pokemon-card-number">{formatId(pokemon.id)}</div>
 
       {spriteUrl && (
         <div className="pokemon-card-sprite">
-          <img src={spriteUrl} alt={pokemon.name} />
+          <img src={spriteUrl} alt={pokemon.name} loading="lazy" />
         </div>
       )}
 
-      <h3 className="pokemon-card-name">
-        {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
-      </h3>
+      <h3 className="pokemon-card-name">{formatName(pokemon.name)}</h3>
 
       <div className="pokemon-card-types">
         {pokemon.types.map((type) => (
