@@ -6,6 +6,8 @@ const DEFAULT_INFO: PokemonInfo = {
   id: 1,
   name: "bulbasaur",
   types: [PokemonType.Grass, PokemonType.Poison],
+  height: 0,
+  weight: 0,
 };
 
 type State = {
@@ -23,6 +25,7 @@ type State = {
   // true when loading one pokemon info
   loadingOne: boolean;
   failureOne: string | null;
+  modalOpen: boolean;
 };
 
 type Actions = {
@@ -32,6 +35,8 @@ type Actions = {
   // - 1 request per-pokemon to fetch species info
   // - 1 request per-pokemon to fetch evolution info
   fetch: () => Promise<void>;
+  openModal: (current: number) => void;
+  closeModal: () => void;
 };
 
 export const usePokemonStore = create<State & Actions>((set, get) => ({
@@ -44,8 +49,18 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
   failureAll: null,
   loadingOne: false,
   failureOne: null,
+  modalOpen: false,
 
   // Actions
+  openModal: (id: number) => {
+    const pokemon = get().pokemon.find((p) => p.id === id);
+    const current = pokemon || DEFAULT_INFO;
+
+    set({ modalOpen: true, current });
+  },
+
+  closeModal: () => set({ modalOpen: false }),
+
   fetch: async () => {
     const URL: string = "https://pokeapi.co/api/v2/pokemon?limit=151&offset=0";
 
