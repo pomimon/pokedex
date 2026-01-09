@@ -1,12 +1,28 @@
-export type {
-  PokemonListItem,
-  PokemonListResponse,
-  PokemonSprites,
-  PokemonType,
-  PokemonDetail,
-  PokemonSpecies,
-  EvolutionChain,
-  EvolutionChainLink,
-  EvolutionChainSpecies,
-  FetchState,
-} from "./pokemon";
+export enum PokemonType {
+  Normal = "normal",
+  Fire = "fire",
+  Water = "water",
+  Electric = "electric",
+  Grass = "grass",
+  Ice = "ice",
+  Fighting = "fighting",
+  Poison = "poison",
+  Ground = "ground",
+  Flying = "flying",
+  Psychic = "psychic",
+  Bug = "bug",
+  Rock = "rock",
+  Ghost = "ghost",
+  Dragon = "dragon",
+  Dark = "dark",
+  Steel = "steel",
+  Fairy = "fairy",
+}
+
+export type PokemonInfo = {
+  id: number;
+  name: string;
+  height: number;
+  weight: number;
+  types: PokemonType[];
+};
