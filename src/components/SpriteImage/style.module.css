@@ -1,0 +1,13 @@
+.sprite {
+  width: var(--sprite-size);
+  height: var(--sprite-size);
+  margin: 0 auto;
+  display: block;
+}
+
+.sprite img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
