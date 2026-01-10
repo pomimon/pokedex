@@ -37,6 +37,8 @@ type Actions = {
   fetch: () => Promise<void>;
   openModal: (current: number) => void;
   closeModal: () => void;
+  nextPokemon: () => void;
+  previousPokemon: () => void;
 };
 
 export const usePokemonStore = create<State & Actions>((set, get) => ({
@@ -60,6 +62,26 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
   },
 
   closeModal: () => set({ modalOpen: false }),
+
+  nextPokemon: () => {
+    const { pokemon, current } = get();
+    if (pokemon.length === 0) return;
+
+    const total = pokemon.length;
+    const nextId = current.id === total ? 1 : current.id + 1;
+
+    set({ current: pokemon[nextId - 1] });
+  },
+
+  previousPokemon: () => {
+    const { pokemon, current } = get();
+    if (pokemon.length === 0) return;
+
+    const total = pokemon.length;
+    const prevId = current.id === 1 ? total : current.id - 1;
+
+    set({ current: pokemon[prevId - 1] });
+  },
 
   fetch: async () => {
     const URL: string = "https://pokeapi.co/api/v2/pokemon?limit=151&offset=0";
