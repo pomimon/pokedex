@@ -80,37 +80,6 @@ code {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
-.modal-header {
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.modal-pokemon-name {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-  text-transform: capitalize;
-}
-
-.modal-pokemon-number {
-  font-size: 1.2rem;
-  color: #666;
-}
-
-.modal-pokemon-sprite {
-  width: 200px;
-  height: 200px;
-  image-rendering: pixelated;
-  margin: 0 auto 1.5rem;
-  display: block;
-}
-
-.modal-types {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-}
-
 /* Flavor Text */
 .modal-flavor-text {
   margin-bottom: 1.5rem;
@@ -125,28 +94,6 @@ code {
   line-height: 1.6;
   color: #555;
   font-style: italic;
-}
-
-.modal-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.modal-stat {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.75rem;
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 8px;
-}
-
-.modal-stat-label {
-  font-weight: bold;
-}
-
-.modal-stat-value {
-  color: #666;
 }
 
 /* Evolution Chain */
