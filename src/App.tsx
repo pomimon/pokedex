@@ -4,7 +4,6 @@ import { CardList } from "@/components/CardList";
 import { Modal } from "@/components/Modal";
 import { ModalDetails } from "@/components/ModalDetails";
 import { usePokemonStore } from "@/store";
-import type { PokemonInfo } from "@/types";
 
 export const App = () => {
   const fetch = usePokemonStore((store) => store.fetch);
