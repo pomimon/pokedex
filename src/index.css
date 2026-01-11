@@ -23,13 +23,22 @@ html {
 body {
   font-family: var(--font-primary);
   color: var(--color-text);
-  background: url("./Assets/background.jpg") center center / cover fixed;
+  background: url("./Assets/oddish.png") center center / cover fixed;
   background-color: var(--color-background);
   image-rendering: pixelated;
   min-height: 100vh;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Main Layout Container */
@@ -71,29 +80,13 @@ code {
 
 .app header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
 }
 
 .app header h1 {
   font-size: 4rem;
   color: black;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-}
-
-/* Flavor Text */
-.modal-flavor-text {
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 8px;
-  text-align: center;
-}
-
-.modal-flavor-text p {
-  margin: 0;
-  line-height: 1.6;
-  color: #555;
-  font-style: italic;
+  text-shadow: 2px 2px 4px #56d5ff;
 }
 
 /* Evolution Chain */
