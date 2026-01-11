@@ -8,6 +8,7 @@ const DEFAULT_INFO: PokemonInfo = {
   types: [PokemonType.Grass, PokemonType.Poison],
   height: 0,
   weight: 0,
+  stats: [],
 };
 
 type State = {
@@ -15,6 +16,12 @@ type State = {
   pokemon: PokemonInfo[];
   // data for the currently selected pokemon
   current: PokemonInfo;
+  // flavor text for the currently selected pokemon
+  flavorText: string | null;
+  // loading species info text for the currently selected pokemon
+  loadingSpecies: boolean;
+  // error messsage for loading species
+  failureSpecies: string | null;
   // list of types the user selected
   searchTypes: PokemonType[];
   // search term provided by the user
@@ -39,12 +46,16 @@ type Actions = {
   closeModal: () => void;
   nextPokemon: () => void;
   previousPokemon: () => void;
+  fetchSpecies: (pokemonId: number) => Promise<void>;
 };
 
 export const usePokemonStore = create<State & Actions>((set, get) => ({
   // State
   pokemon: [],
   current: DEFAULT_INFO,
+  flavorText: null,
+  loadingSpecies: false,
+  failureSpecies: null,
   searchTypes: [],
   searchQuery: "",
   loadingAll: false,
@@ -58,7 +69,7 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
     const pokemon = get().pokemon.find((p) => p.id === id);
     const current = pokemon || DEFAULT_INFO;
 
-    set({ modalOpen: true, current });
+    set({ modalOpen: true, current, flavorText: null });
   },
 
   closeModal: () => set({ modalOpen: false }),
@@ -83,18 +94,37 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
     set({ current: pokemon[prevId - 1] });
   },
 
+  fetchSpecies: async (pokemonId: number) => {
+    if (get().loadingSpecies) return;
+
+    set({ loadingSpecies: true, failureSpecies: null });
+
+    try {
+      const response = await fetch(
+        `https://pokeapi.co/api/v2/pokemon-species/${pokemonId}/`,
+      );
+      const json = await response.json();
+
+      const entry = json.flavor_text_entries.find(
+        (e: any) => e.language.name === "en",
+      );
+
+      const flavorText = entry ? entry.flavor_text.replace(/\f/g, " ") : null;
+
+      set({ flavorText });
+    } catch (error) {
+      console.error(error);
+      set({ failureSpecies: "Failed to load species data" });
+    } finally {
+      set({ loadingSpecies: false });
+    }
+  },
+
   fetch: async () => {
     const URL: string = "https://pokeapi.co/api/v2/pokemon?limit=151&offset=0";
 
-    if (get().pokemon.length > 0) {
-      // ignore if already loaded
-      return;
-    }
-
-    if (get().loadingAll) {
-      // ignore if already loading
-      return;
-    }
+    if (get().pokemon.length > 0) return;
+    if (get().loadingAll) return;
 
     set({ loadingAll: true, failureAll: null });
 
@@ -111,12 +141,20 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
           return type.type.name as keyof typeof PokemonType;
         });
 
+        // Add base stats
+        const stats = json.stats.map((stat: any) => ({
+          name: stat.stat.name, // gets hp, attack, defense, etc
+          value: stat.base_stat,
+        }));
+
         return {
           id: json.id,
           name: json.name,
           height: json.height,
           weight: json.weight,
           types,
+          base_experience: json.base_experience,
+          stats,
         };
       });
 
