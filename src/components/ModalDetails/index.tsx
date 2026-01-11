@@ -29,6 +29,12 @@ export const ModalDetails = ({ pokemon }: ModalProps) => {
     ["--type-color-b" as any]: typeColorB,
   };
 
+  const STAT_NAMES: Record<string, string> = {
+    "special-attack": "Special Attack",
+    "special-defense": "Special Defense",
+    hp: "HP",
+  };
+
   return (
     <div className={styles.container} style={containerStyles}>
       <div className={styles.header}>
@@ -53,23 +59,25 @@ export const ModalDetails = ({ pokemon }: ModalProps) => {
       </div>
 
       <div className={styles.flavorText}>
-        {loadingSpecies ? <p>Loading…</p> : <p>{flavorText}</p>}
+        {loadingSpecies ? <p>Loading...</p> : <p>{flavorText}</p>}
       </div>
 
       <div className={styles.stats}>
         <div className={styles.stat}>
-          <span className={styles.label}>Height:</span>
+          <span className={styles.label}>Height</span>
           <span className={styles.value}>{pokemon.height / 10}m</span>
         </div>
 
         <div className={styles.stat}>
-          <span className={styles.label}>Weight:</span>
+          <span className={styles.label}>Weight</span>
           <span className={styles.value}>{pokemon.weight / 10}kg</span>
         </div>
 
         {pokemon.stats.map((stat) => (
           <div key={stat.name} className={styles.stat}>
-            <span className={styles.label}>{capitalize(stat.name)}:</span>
+            <span className={styles.label}>
+              {STAT_NAMES[stat.name] || capitalize(stat.name)}
+            </span>
             <span className={styles.value}>{stat.value}</span>
           </div>
         ))}
