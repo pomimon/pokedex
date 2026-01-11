@@ -1,5 +1,7 @@
+import { useEffect } from "react";
+
 import type { PokemonInfo } from "@/types";
-import { capitalize, formatId } from "@/utils";
+import { capitalize, formatId, getPokeColor } from "@/utils";
 import { TypeBadge } from "@/components/TypeBadge";
 import { SpriteImage } from "@/components/SpriteImage";
 import { usePokemonStore } from "@/store";
@@ -10,22 +12,39 @@ type ModalProps = {
 };
 
 export const ModalDetails = ({ pokemon }: ModalProps) => {
-  console.log("ModalDetails", pokemon);
   const next = usePokemonStore((s) => s.nextPokemon);
   const previous = usePokemonStore((s) => s.previousPokemon);
+  const flavorText = usePokemonStore((s) => s.flavorText);
+  const loadingSpecies = usePokemonStore((s) => s.loadingSpecies);
+  const fetchSpecies = usePokemonStore((s) => s.fetchSpecies);
+
+  useEffect(() => {
+    fetchSpecies(pokemon.id);
+  }, [pokemon.id, fetchSpecies]);
+
+  const { typeColorA, typeColorB } = getPokeColor(pokemon.types);
+
+  const containerStyles: React.CSSProperties = {
+    ["--type-color-a" as any]: typeColorA,
+    ["--type-color-b" as any]: typeColorB,
+  };
 
   return (
-    <div>
+    <div className={styles.container} style={containerStyles}>
       <div className={styles.header}>
-        <div className={styles.navigation}>
-          <button onClick={previous}>←</button>
-          <h2 className={styles.name}>{capitalize(pokemon.name)}</h2>
-          <button onClick={next}>→</button>
-        </div>
+        <h2 className={styles.name}>{capitalize(pokemon.name)}</h2>
         <div className={styles.number}>{formatId(pokemon.id)}</div>
       </div>
 
-      <SpriteImage id={pokemon.id} name={pokemon.name} size={250} />
+      <div className={styles.navigation}>
+        <button onClick={previous}>
+          <div className={styles.chevronLeft} />
+        </button>
+        <SpriteImage id={pokemon.id} name={pokemon.name} size={250} />
+        <button onClick={next}>
+          <div className={styles.chevronRight} />
+        </button>
+      </div>
 
       <div className={styles.types}>
         {pokemon.types.map((type) => (
@@ -34,7 +53,7 @@ export const ModalDetails = ({ pokemon }: ModalProps) => {
       </div>
 
       <div className={styles.flavorText}>
-        <p>TODO: Get Fabulous</p>
+        {loadingSpecies ? <p>Loading…</p> : <p>{flavorText}</p>}
       </div>
 
       <div className={styles.stats}>
@@ -42,10 +61,18 @@ export const ModalDetails = ({ pokemon }: ModalProps) => {
           <span className={styles.label}>Height:</span>
           <span className={styles.value}>{pokemon.height / 10}m</span>
         </div>
+
         <div className={styles.stat}>
           <span className={styles.label}>Weight:</span>
           <span className={styles.value}>{pokemon.weight / 10}kg</span>
         </div>
+
+        {pokemon.stats.map((stat) => (
+          <div key={stat.name} className={styles.stat}>
+            <span className={styles.label}>{capitalize(stat.name)}:</span>
+            <span className={styles.value}>{stat.value}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
