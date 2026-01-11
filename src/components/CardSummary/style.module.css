@@ -10,10 +10,19 @@
   position: relative;
   text-align: center;
   cursor: pointer;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+  transition: all 200ms;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.67);
+
+  &:hover {
+    transform: translateY(-2px);
+
+    /*box-shadow:
+      5px -4px 16px var(--type-color-a),
+      -5px 4px 16px var(--type-color-b);*/
+
+    border-color: var(--type-color-a) var(--type-color-b) var(--type-color-b)
+      var(--type-color-a);
+  }
 }
 
 .header {
@@ -37,13 +46,6 @@
   color: white;
   position: absolute;
   padding-left: 4px;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    5px -4px 16px var(--type-color-a),
-    -5px 4px 16px var(--type-color-b);
 }
 
 /*.sprite {
