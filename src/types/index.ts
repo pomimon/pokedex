@@ -18,6 +18,10 @@ export enum PokemonType {
   Steel = "steel",
   Fairy = "fairy",
 }
+export type Stat = {
+  name: string;
+  value: number;
+};
 
 export type PokemonInfo = {
   id: number;
@@ -25,4 +29,13 @@ export type PokemonInfo = {
   height: number;
   weight: number;
   types: PokemonType[];
+  stats: Stat[];
+  flavourText: string | null;
 };
+
+export type EvolutionPokemon = {
+  id: number;
+  name: string;
+};
+
+export type EvolutionChain = EvolutionPokemon[];
