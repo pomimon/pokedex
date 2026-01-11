@@ -1,6 +1,7 @@
 import styles from "./style.module.css";
 import type { PokemonInfo } from "@/types";
 import { CardSummary } from "@/components/CardSummary";
+import pokeball from "@/Assets/pokeball.png";
 
 type CardProps = {
   pokemon: PokemonInfo[];
@@ -12,6 +13,7 @@ export const CardList = ({ pokemon, loading }: CardProps) => {
     return (
       <div className={styles.info}>
         <p>Loading Pokédex...</p>
+        <img src={pokeball} alt="pokeball" />
       </div>
     );
   }
