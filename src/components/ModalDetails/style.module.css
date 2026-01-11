@@ -1,6 +1,86 @@
+.container {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  border-radius: 16px;
+  background-color: #181829;
+  border: 5px solid black;
+  border-top-color: var(--type-color-a);
+  border-left-color: var(--type-color-a);
+  border-bottom-color: var(--type-color-b);
+  border-right-color: var(--type-color-b);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-height: 100%;
+  overflow-y: scroll;
+  padding: 2rem;
+
+  > * {
+    &:not(:last-child) {
+      margin-bottom: 1.5rem;
+    }
+  }
+}
+
 .header {
-  margin-bottom: 1.5rem;
   text-align: center;
+  color: white;
+}
+
+.name {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  text-transform: capitalize;
+  color: white;
+}
+
+.number {
+  color: white;
+  font-size: 1.2rem;
+}
+
+.sprite {
+  width: 200px;
+  height: 200px;
+  image-rendering: pixelated;
+  margin: 0 auto 1.5rem;
+  display: block;
+}
+
+.types {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  /*gap: 0.75rem;*/
+}
+
+.stat {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 10px;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.label {
+  /*font-weight: bold;*/
+  font-size: 10px;
+  color: white;
+}
+
+.value {
+  color: white;
 }
 
 .navigation {
@@ -22,50 +102,36 @@
   opacity: 0.7;
 }
 
-.name {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-  text-transform: capitalize;
+.chevronRight {
+  border-bottom: 4px solid #8a8a8a;
+  border-right: 4px solid #8a8a8a;
+  display: inline-block;
+  height: 30px;
+  transform: rotate(-45deg);
+  width: 30px;
 }
 
-.number {
-  color: #666;
-  font-size: 1.2rem;
+.chevronLeft {
+  border-bottom: 4px solid #8a8a8a;
+  border-right: 4px solid #8a8a8a;
+  display: inline-block;
+  height: 30px;
+  transform: rotate(135deg);
+  width: 30px;
 }
 
-.sprite {
-  width: 200px;
-  height: 200px;
-  image-rendering: pixelated;
-  margin: 0 auto 1.5rem;
-  display: block;
-}
-
-.types {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-}
-
-.stats {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.stat {
-  background-color: rgba(0, 0, 0, 0.05);
+.flavorText {
+  background-color: rgba(0, 0, 0, 0.02);
   border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  padding: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  text-align: center;
 }
 
-.label {
-  font-weight: bold;
-}
-
-.value {
-  color: #666;
+.flavorText p {
+  color: white;
+  font-style: italic;
+  line-height: 1.6;
+  margin: 0;
+  text-align: center;
 }
