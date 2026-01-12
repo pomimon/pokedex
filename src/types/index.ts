@@ -33,9 +33,10 @@ export type PokemonInfo = {
   flavourText: string | null;
 };
 
-export type EvolutionPokemon = {
+export type Evolution = {
   id: number;
   name: string;
+  types: PokemonType[];
 };
 
-export type EvolutionChain = EvolutionPokemon[];
+export type EvolutionChain = Evolution[];
