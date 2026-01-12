@@ -1,10 +1,22 @@
+.container {
+  background-color: #181829;
+  border-radius: 12px;
+  border: 4px solid black;
+  padding: 3.5rem 5rem 5rem 5rem;
+  margin-bottom: 2rem;
+  position: relative;
+
+  p {
+    color: white;
+    margin-bottom: 1.5rem;
+  }
+}
+
 .typeFilter {
   display: flex;
   flex-wrap: wrap;
   gap: 0.8rem;
   justify-content: center;
-  margin-top: 9rem;
-  margin-bottom: 4rem;
 }
 
 .typeButton {
@@ -14,11 +26,16 @@
   display: inline-flex;
   gap: 0.25rem;
   justify-content: center;
-  min-width: 40px;
-  transition: transform 0.1s ease;
+  transition: transform opacity 0.1s ease;
+  flex: 1;
 
   &.active {
-    transform: scale(1.1);
+    transform: scale(1.05);
+  }
+
+  &.disabled {
+    opacity: 0.35;
+    transform: none;
   }
 }
 
