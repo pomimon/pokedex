@@ -13,7 +13,7 @@
   border-bottom-color: var(--type-color-b);
   border-right-color: var(--type-color-b);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  max-height: 100%;
+  max-height: 90vh;
   overflow-y: scroll;
   padding: 2rem;
   width: 100%;
