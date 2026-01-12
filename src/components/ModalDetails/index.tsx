@@ -7,20 +7,17 @@ import { SpriteImage } from "@/components/SpriteImage";
 import { usePokemonStore } from "@/store";
 import styles from "./style.module.css";
 
-type ModalProps = {
-  pokemon: PokemonInfo;
-};
-
-export const ModalDetails = ({ pokemon }: ModalProps) => {
+export const ModalDetails = () => {
+  const pokemon = usePokemonStore((s) => s.current);
   const next = usePokemonStore((s) => s.nextPokemon);
   const previous = usePokemonStore((s) => s.previousPokemon);
+
   const flavorText = usePokemonStore((s) => s.flavorText);
   const loadingSpecies = usePokemonStore((s) => s.loadingSpecies);
-  const fetchSpecies = usePokemonStore((s) => s.fetchSpecies);
 
-  useEffect(() => {
-    fetchSpecies(pokemon.id);
-  }, [pokemon.id, fetchSpecies]);
+  const evolutions = usePokemonStore((s) => s.evolutions);
+  const loadingEvolution = usePokemonStore((s) => s.loadingEvolution);
+  const openModal = usePokemonStore((s) => s.openModal);
 
   const { typeColorA, typeColorB } = getPokeColor(pokemon.types);
 
@@ -82,6 +79,33 @@ export const ModalDetails = ({ pokemon }: ModalProps) => {
           </div>
         ))}
       </div>
+      {evolutions.length > 1 && (
+        <div className={styles.evolutions}>
+          <h3>Evolutions</h3>
+
+          <div className={styles.evolutionList}>
+            {evolutions.map((evo) => (
+              <button
+                key={evo.id}
+                className={styles.evolution}
+                onClick={() => openModal(evo.id)}
+              >
+                <SpriteImage id={evo.id} name={evo.name} size={80} />
+
+                <span className={styles.evolutionName}>
+                  {capitalize(evo.name)}
+                </span>
+
+                {/*<div className={styles.evolutionTypes}>
+                  {evo.types.map((type) => (
+                    <TypeBadge key={type} type={type} />
+                  ))}
+                </div>*/}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
