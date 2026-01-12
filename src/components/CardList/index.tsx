@@ -10,13 +10,14 @@ type CardProps = {
 };
 
 export const CardList = ({ pokemon, loading }: CardProps) => {
-  const searchTypes = usePokemonStore((s) => s.searchTypes);
+  const searchType = usePokemonStore((s) => s.searchType);
 
-  const filteredPokemon = pokemon.filter((p) =>
-    searchTypes.length === 0
-      ? true
-      : searchTypes.every((type) => p.types.includes(type)),
-  );
+  const filteredPokemon =
+    searchType === null
+      ? pokemon
+      : pokemon.filter((p) => p.types.includes(searchType));
+
+  //  p.types.includes(searchType),
 
   if (loading) {
     return (
