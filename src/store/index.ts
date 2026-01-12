@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { type PokemonInfo, PokemonType } from "@/types";
+import { type PokemonInfo, PokemonType, type EvolutionChain } from "@/types";
 
 const DEFAULT_INFO: PokemonInfo = {
   id: 1,
@@ -22,6 +22,9 @@ type State = {
   loadingSpecies: boolean;
   // error messsage for loading species
   failureSpecies: string | null;
+  evolutions: EvolutionChain;
+  loadingEvolution: boolean;
+  failureEvolution: string | null;
   // list of types the user selected
   searchTypes: PokemonType[];
   // search term provided by the user
@@ -47,6 +50,7 @@ type Actions = {
   nextPokemon: () => void;
   previousPokemon: () => void;
   fetchSpecies: (pokemonId: number) => Promise<void>;
+  fetchEvolution: (pokemonId: number) => Promise<void>;
 };
 
 export const usePokemonStore = create<State & Actions>((set, get) => ({
@@ -56,6 +60,9 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
   flavorText: null,
   loadingSpecies: false,
   failureSpecies: null,
+  evolutions: [],
+  loadingEvolution: false,
+  failureEvolution: null,
   searchTypes: [],
   searchQuery: "",
   loadingAll: false,
@@ -69,7 +76,14 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
     const pokemon = get().pokemon.find((p) => p.id === id);
     const current = pokemon || DEFAULT_INFO;
 
-    set({ modalOpen: true, current, flavorText: null });
+    set({
+      modalOpen: true,
+      current,
+      flavorText: null,
+      evolutions: [],
+    });
+    get().fetchSpecies(id);
+    get().fetchEvolution(id);
   },
 
   closeModal: () => set({ modalOpen: false }),
@@ -81,7 +95,12 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
     const total = pokemon.length;
     const nextId = current.id === total ? 1 : current.id + 1;
 
-    set({ current: pokemon[nextId - 1] });
+    const next = pokemon[nextId - 1];
+
+    set({ current: next, flavorText: null, evolutions: [] });
+
+    get().fetchSpecies(next.id);
+    get().fetchEvolution(next.id);
   },
 
   previousPokemon: () => {
@@ -90,8 +109,12 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
 
     const total = pokemon.length;
     const prevId = current.id === 1 ? total : current.id - 1;
+    const prev = pokemon[prevId - 1];
 
-    set({ current: pokemon[prevId - 1] });
+    set({ current: prev, flavorText: null, evolutions: [] });
+
+    get().fetchSpecies(prev.id);
+    get().fetchEvolution(prev.id);
   },
 
   fetchSpecies: async (pokemonId: number) => {
@@ -117,6 +140,56 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
       set({ failureSpecies: "Failed to load species data" });
     } finally {
       set({ loadingSpecies: false });
+    }
+  },
+
+  fetchEvolution: async (pokemonId: number) => {
+    if (get().loadingEvolution) return;
+
+    set({ loadingEvolution: true, failureEvolution: null, evolutions: [] });
+
+    try {
+      // 1. species
+      const speciesRes = await fetch(
+        `https://pokeapi.co/api/v2/pokemon-species/${pokemonId}/`,
+      );
+      const speciesJson = await speciesRes.json();
+
+      // 2. evolution chain
+      const evoRes = await fetch(speciesJson.evolution_chain.url);
+      const evoJson = await evoRes.json();
+
+      // 3. flatten chain
+      const evolutions: EvolutionChain = [];
+
+      const walk = async (node: any) => {
+        const urlParts = node.species.url.split("/").filter(Boolean);
+        const id = Number(urlParts[urlParts.length - 1]);
+
+        const pokemonRes = await fetch(
+          `https://pokeapi.co/api/v2/pokemon/${id}/`,
+        );
+        const pokemonJson = await pokemonRes.json();
+
+        evolutions.push({
+          id,
+          name: node.species.name,
+          types: pokemonJson.types.map((t: any) => t.type.name as PokemonType),
+        });
+
+        for (const next of node.evolves_to) {
+          await walk(next);
+        }
+      };
+
+      await walk(evoJson.chain);
+
+      set({ evolutions });
+    } catch (err) {
+      console.error(err);
+      set({ failureEvolution: "Failed to load evolution data" });
+    } finally {
+      set({ loadingEvolution: false });
     }
   },
 
