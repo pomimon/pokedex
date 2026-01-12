@@ -8,6 +8,7 @@ const DEFAULT_INFO: PokemonInfo = {
   types: [PokemonType.Grass, PokemonType.Poison],
   height: 0,
   weight: 0,
+  flavourText: null,
   stats: [],
 };
 
@@ -26,7 +27,7 @@ type State = {
   loadingEvolution: boolean;
   failureEvolution: string | null;
   // list of types the user selected
-  searchTypes: PokemonType[];
+  searchType: PokemonType | null;
   // search term provided by the user
   searchQuery: string;
   // true when loading all pokemon info
@@ -65,7 +66,7 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
   evolutions: [],
   loadingEvolution: false,
   failureEvolution: null,
-  searchTypes: [],
+  searchType: null,
   searchQuery: "",
   loadingAll: false,
   failureAll: null,
@@ -75,18 +76,12 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
 
   // Actions
   //
-  toggleTypeFilter: (type: PokemonType) => {
-    const currentFilters = get().searchTypes;
-    if (currentFilters.includes(type)) {
-      // remove type
-      set({ searchTypes: currentFilters.filter((t) => t !== type) });
-    } else {
-      // add type
-      set({ searchTypes: [...currentFilters, type] });
-    }
-  },
+  toggleTypeFilter: (type: PokemonType) =>
+    set((state) => ({
+      searchType: state.searchType === type ? null : type,
+    })),
 
-  clearTypeFilters: () => set({ searchTypes: [] }),
+  clearTypeFilters: () => set({ searchType: null }),
 
   openModal: (id: number) => {
     const pokemon = get().pokemon.find((p) => p.id === id);
