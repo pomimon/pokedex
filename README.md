@@ -34,6 +34,6 @@ Check out the site here: https://pomimon.github.io/pokedex/
 
 ## Notes
 
-Evolutions are filtered to the first 151 Pokémon.
-Only one type filter can be active at a time.
-Pokémon data is fetched from the PokéAPI; modal flavor text and evolutions are loaded on demand.
+- Evolutions are filtered to the first 151 Pokémon.
+- Only one type filter can be active at a time.
+- Pokémon data is fetched from the PokéAPI; modal flavor text and evolutions are loaded on demand.
