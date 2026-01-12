@@ -79,6 +79,7 @@ export const ModalDetails = () => {
           </div>
         ))}
       </div>
+
       {evolutions.length > 1 && (
         <div className={styles.evolutions}>
           <h3>Evolutions</h3>

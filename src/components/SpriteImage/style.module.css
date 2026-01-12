@@ -1,13 +1,17 @@
-.sprite {
-  width: var(--sprite-size);
-  height: var(--sprite-size);
-  margin: 0 auto;
-  display: block;
+:root {
+  /*This is set in the component*/
+  --sprite-size: 0;
 }
 
-.sprite img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  image-rendering: pixelated;
+.sprite {
+  display: block;
+  height: var(--sprite-size);
+  margin: 0 auto;
+  width: var(--sprite-size);
+
+  img {
+    height: 100%;
+    object-fit: contain;
+    width: 100%;
+  }
 }

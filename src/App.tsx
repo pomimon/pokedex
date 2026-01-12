@@ -2,6 +2,7 @@ import { useEffect } from "react";
 
 import { CardList } from "@/components/CardList";
 import { Modal } from "@/components/Modal";
+import { TypeFilter } from "@/components/TypeFilter";
 import { ModalDetails } from "@/components/ModalDetails";
 import { usePokemonStore } from "@/store";
 
@@ -43,12 +44,15 @@ export const App = () => {
       </header>
 
       <main>
+        <TypeFilter />
         <CardList pokemon={pokemon} loading={loadingAll} />
       </main>
 
       <Modal isOpen={modalOpen} onClose={closeModal}>
-        <ModalDetails pokemon={current} />
+        <ModalDetails />
       </Modal>
+
+      <footer></footer>
     </div>
   );
 };

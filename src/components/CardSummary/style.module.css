@@ -16,10 +16,6 @@
   &:hover {
     transform: translateY(-2px);
 
-    /*box-shadow:
-      5px -4px 16px var(--type-color-a),
-      -5px 4px 16px var(--type-color-b);*/
-
     border-color: var(--type-color-a) var(--type-color-b) var(--type-color-b)
       var(--type-color-a);
   }
@@ -38,57 +34,27 @@
   position: absolute;
   top: 0;
   width: calc(100% - 16px);
-}
 
-.number {
-  font-weight: bold;
-  font-size: 14px;
-  color: white;
-  position: absolute;
-  padding-left: 4px;
-}
-
-/*.sprite {
-  --sprite-size: 120px;
-
-  width: var(--sprite-size);
-  height: var(--sprite-size);
-  margin: 0 auto;
-  display: block;
-
-  img {
-    width: var(--sprite-size);
-    height: var(--sprite-size);
-    object-fit: contain;
-    image-rendering: pixelated;
+  .number {
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    padding-left: 4px;
+    position: absolute;
   }
-}*/
-
-.sprite {
-  width: var(--sprite-size);
-  height: var(--sprite-size);
-  margin: 0 auto;
-  display: block;
-}
-
-.sprite img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  image-rendering: pixelated;
 }
 
 .name {
   color: white;
   font-size: 1.1rem;
-  margin-top: 1rem;
   margin-bottom: 1.2rem;
-  text-transform: capitalize;
+  margin-top: 1rem;
+  text-transform: uppercase;
 }
 
 .types {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   justify-content: center;
-  flex-wrap: wrap;
 }

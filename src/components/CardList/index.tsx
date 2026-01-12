@@ -2,6 +2,7 @@ import styles from "./style.module.css";
 import type { PokemonInfo } from "@/types";
 import { CardSummary } from "@/components/CardSummary";
 import pokeball from "@/Assets/pokeball.png";
+import { usePokemonStore } from "@/store";
 
 type CardProps = {
   pokemon: PokemonInfo[];
@@ -9,6 +10,14 @@ type CardProps = {
 };
 
 export const CardList = ({ pokemon, loading }: CardProps) => {
+  const searchTypes = usePokemonStore((s) => s.searchTypes);
+
+  const filteredPokemon = pokemon.filter((p) =>
+    searchTypes.length === 0
+      ? true
+      : searchTypes.every((type) => p.types.includes(type)),
+  );
+
   if (loading) {
     return (
       <div className={styles.info}>
@@ -18,7 +27,7 @@ export const CardList = ({ pokemon, loading }: CardProps) => {
     );
   }
 
-  if (pokemon.length === 0) {
+  if (filteredPokemon.length === 0) {
     return (
       <div className={styles.info}>
         <p>No Pokémon found.</p>
@@ -28,7 +37,7 @@ export const CardList = ({ pokemon, loading }: CardProps) => {
 
   return (
     <div className={styles.list}>
-      {pokemon.map((p) => (
+      {filteredPokemon.map((p) => (
         <CardSummary key={p.id} id={p.id} name={p.name} types={p.types} />
       ))}
     </div>

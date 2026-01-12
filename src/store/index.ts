@@ -51,6 +51,8 @@ type Actions = {
   previousPokemon: () => void;
   fetchSpecies: (pokemonId: number) => Promise<void>;
   fetchEvolution: (pokemonId: number) => Promise<void>;
+  toggleTypeFilter: (type: PokemonType) => void;
+  clearTypeFilters: () => void;
 };
 
 export const usePokemonStore = create<State & Actions>((set, get) => ({
@@ -72,6 +74,20 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
   modalOpen: false,
 
   // Actions
+  //
+  toggleTypeFilter: (type: PokemonType) => {
+    const currentFilters = get().searchTypes;
+    if (currentFilters.includes(type)) {
+      // remove type
+      set({ searchTypes: currentFilters.filter((t) => t !== type) });
+    } else {
+      // add type
+      set({ searchTypes: [...currentFilters, type] });
+    }
+  },
+
+  clearTypeFilters: () => set({ searchTypes: [] }),
+
   openModal: (id: number) => {
     const pokemon = get().pokemon.find((p) => p.id === id);
     const current = pokemon || DEFAULT_INFO;

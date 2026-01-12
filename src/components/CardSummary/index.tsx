@@ -1,7 +1,7 @@
 import styles from "./style.module.css";
 import type { PokemonInfo, PokemonType } from "@/types";
 import { TypeBadge } from "@/components/TypeBadge";
-import { capitalize, formatId, getSpriteUrl, getPokeColor } from "@/utils";
+import { formatId, getSpriteUrl, getPokeColor } from "@/utils";
 import { usePokemonStore } from "@/store";
 import { SpriteImage } from "@/components/SpriteImage";
 
@@ -29,7 +29,7 @@ export const CardSummary = ({ id, name, types }: Props) => {
         <div className={styles.number}>{formatId(id)}</div>
       </div>
       <SpriteImage id={id} name={name} size={120} />
-      <h3 className={styles.name}>{capitalize(name)}</h3>
+      <h3 className={styles.name}>{name}</h3>
       <div className={styles.types}>{badges}</div>
     </div>
   );
