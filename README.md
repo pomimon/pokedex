@@ -1,4 +1,4 @@
-# Pokémon Dex (React + Zustand)
+# Pokédex (React + Zustand)
 
 A Pokémon Pokédex application built with React, TypeScript, and Zustand.  
 Displays information for the first 151 Pokémon, including types, stats, flavor text, and evolution chains. Includes filtering by type.
