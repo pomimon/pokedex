@@ -161,28 +161,28 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
 
       // 3. flatten chain
       const evolutions: EvolutionChain = [];
+      const allPokemon = get().pokemon;
 
-      const walk = async (node: any) => {
+      const walk = (node: any) => {
         const urlParts = node.species.url.split("/").filter(Boolean);
         const id = Number(urlParts[urlParts.length - 1]);
 
-        const pokemonRes = await fetch(
-          `https://pokeapi.co/api/v2/pokemon/${id}/`,
-        );
-        const pokemonJson = await pokemonRes.json();
-
-        evolutions.push({
-          id,
-          name: node.species.name,
-          types: pokemonJson.types.map((t: any) => t.type.name as PokemonType),
-        });
-
-        for (const next of node.evolves_to) {
-          await walk(next);
+        // Only include first 151 Pokémon
+        if (id <= 151) {
+          const found = allPokemon.find((p) => p.id === id);
+          if (found) {
+            evolutions.push({
+              id: found.id,
+              name: found.name,
+              types: found.types,
+            });
+          }
         }
+
+        node.evolves_to.forEach(walk);
       };
 
-      await walk(evoJson.chain);
+      walk(evoJson.chain);
 
       set({ evolutions });
     } catch (err) {
