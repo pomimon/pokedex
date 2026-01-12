@@ -25,7 +25,7 @@ Check out the site here: https://pomimon.github.io/pokedex/
 
 ## Tech Stack
 
-- React 19 withTypeScript
+- React 19 with TypeScript
 - Zustand for state management
 - CSS Modules for styling
 - Fetches data from PokéAPI (https://pokeapi.co/)
