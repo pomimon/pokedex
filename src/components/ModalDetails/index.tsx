@@ -19,6 +19,22 @@ export const ModalDetails = () => {
   const loadingEvolution = usePokemonStore((s) => s.loadingEvolution);
   const openModal = usePokemonStore((s) => s.openModal);
 
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        previous();
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        next();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [previous, next]);
+
   const { typeColorA, typeColorB } = getPokeColor(pokemon.types);
 
   const containerStyles: React.CSSProperties = {
@@ -35,16 +51,26 @@ export const ModalDetails = () => {
   return (
     <div className={styles.container} style={containerStyles}>
       <div className={styles.header}>
-        <h2 className={styles.name}>{capitalize(pokemon.name)}</h2>
+        <h2 id="modal-title" className={styles.name}>
+          {capitalize(pokemon.name)}
+        </h2>
         <div className={styles.number}>{formatId(pokemon.id)}</div>
       </div>
 
       <div className={styles.navigation}>
-        <button onClick={previous}>
+        <button
+          onClick={previous}
+          aria-label="Previous Pokémon (Left Arrow)"
+          title="Previous Pokémon"
+        >
           <div className={styles.chevronLeft} />
         </button>
         <SpriteImage id={pokemon.id} name={pokemon.name} size={250} />
-        <button onClick={next}>
+        <button
+          onClick={next}
+          aria-label="Next Pokémon (Right Arrow)"
+          title="Next Pokémon"
+        >
           <div className={styles.chevronRight} />
         </button>
       </div>
@@ -90,18 +116,13 @@ export const ModalDetails = () => {
                 key={evo.id}
                 className={styles.evolution}
                 onClick={() => openModal(evo.id)}
+                aria-label={`View ${capitalize(evo.name)}`}
               >
                 <SpriteImage id={evo.id} name={evo.name} size={80} />
 
                 <span className={styles.evolutionName}>
                   {capitalize(evo.name)}
                 </span>
-
-                {/*<div className={styles.evolutionTypes}>
-                  {evo.types.map((type) => (
-                    <TypeBadge key={type} type={type} />
-                  ))}
-                </div>*/}
               </button>
             ))}
           </div>
