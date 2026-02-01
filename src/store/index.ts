@@ -2,6 +2,8 @@ import { create } from "zustand";
 
 import { type PokemonInfo, PokemonType, type EvolutionChain } from "@/types";
 import { fetchAllPokemon } from "@/utils/fetchAllPokemon";
+import { fetchSpeciesData } from "@/utils/fetchSpeciesData";
+import { getFlavorText } from "@/utils/getFlavorText";
 
 const DEFAULT_INFO: PokemonInfo = {
   id: 1,
@@ -124,17 +126,8 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
     set({ loading: true, failure: null });
 
     try {
-      const response = await fetch(
-        `https://pokeapi.co/api/v2/pokemon-species/${pokemonId}/`,
-      );
-      const json = await response.json();
-
-      const entry = json.flavor_text_entries.find(
-        (e: any) => e.language.name === "en",
-      );
-
-      const flavorText = entry ? entry.flavor_text.replace(/\f/g, " ") : null;
-
+      const speciesData = await fetchSpeciesData(pokemonId);
+      const flavorText = getFlavorText(speciesData);
       set({ flavorText });
     } catch (error) {
       console.error(error);
@@ -145,8 +138,6 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
   },
 
   fetchEvolution: async (pokemonId: number) => {
-    if (get().loading) return;
-
     set({ loading: true, failure: null, evolutions: [] });
 
     try {
