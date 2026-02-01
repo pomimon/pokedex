@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 import { type PokemonInfo, PokemonType, type EvolutionChain } from "@/types";
+import { fetchAllPokemon } from "@/utils/fetchAllPokemon";
 
 const DEFAULT_INFO: PokemonInfo = {
   id: 1,
@@ -19,24 +20,18 @@ type State = {
   current: PokemonInfo;
   // flavor text for the currently selected pokemon
   flavorText: string | null;
-  // loading species info text for the currently selected pokemon
-  loadingSpecies: boolean;
-  // error messsage for loading species
-  failureSpecies: string | null;
+
   evolutions: EvolutionChain;
-  loadingEvolution: boolean;
-  failureEvolution: string | null;
+
   // list of types the user selected
   searchType: PokemonType | null;
   // search term provided by the user
   searchQuery: string;
-  // true when loading all pokemon info
-  loadingAll: boolean;
-  failureAll: string | null;
-  // true when loading one pokemon info
-  loadingOne: boolean;
-  failureOne: string | null;
+
   modalOpen: boolean;
+
+  loading: boolean;
+  failure: string | null;
 };
 
 type Actions = {
@@ -61,17 +56,12 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
   pokemon: [],
   current: DEFAULT_INFO,
   flavorText: null,
-  loadingSpecies: false,
-  failureSpecies: null,
   evolutions: [],
-  loadingEvolution: false,
   failureEvolution: null,
   searchType: null,
   searchQuery: "",
-  loadingAll: false,
-  failureAll: null,
-  loadingOne: false,
-  failureOne: null,
+  loading: false,
+  failure: null,
   modalOpen: false,
 
   // Actions
@@ -129,9 +119,9 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
   },
 
   fetchSpecies: async (pokemonId: number) => {
-    if (get().loadingSpecies) return;
+    if (get().loading) return;
 
-    set({ loadingSpecies: true, failureSpecies: null });
+    set({ loading: true, failure: null });
 
     try {
       const response = await fetch(
@@ -148,16 +138,16 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
       set({ flavorText });
     } catch (error) {
       console.error(error);
-      set({ failureSpecies: "Failed to load species data" });
+      set({ failure: "Failed to load species data" });
     } finally {
-      set({ loadingSpecies: false });
+      set({ loading: false });
     }
   },
 
   fetchEvolution: async (pokemonId: number) => {
-    if (get().loadingEvolution) return;
+    if (get().loading) return;
 
-    set({ loadingEvolution: true, failureEvolution: null, evolutions: [] });
+    set({ loading: true, failure: null, evolutions: [] });
 
     try {
       // 1. species
@@ -174,7 +164,7 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
       const evolutions: EvolutionChain = [];
       const allPokemon = get().pokemon;
 
-      const walk = (node: any) => {
+      const limitPokemon = (node: any) => {
         const urlParts = node.species.url.split("/").filter(Boolean);
         const id = Number(urlParts[urlParts.length - 1]);
 
@@ -190,67 +180,35 @@ export const usePokemonStore = create<State & Actions>((set, get) => ({
           }
         }
 
-        node.evolves_to.forEach(walk);
+        node.evolves_to.forEach(limitPokemon);
       };
 
-      walk(evoJson.chain);
+      limitPokemon(evoJson.chain);
 
       set({ evolutions });
     } catch (err) {
       console.error(err);
-      set({ failureEvolution: "Failed to load evolution data" });
+      set({ failure: "Failed to load evolution data" });
     } finally {
-      set({ loadingEvolution: false });
+      set({ loading: false });
     }
   },
 
   fetch: async () => {
-    const URL: string = "https://pokeapi.co/api/v2/pokemon?limit=151&offset=0";
-
     if (get().pokemon.length > 0) return;
-    if (get().loadingAll) return;
+    if (get().loading) return;
 
-    set({ loadingAll: true, failureAll: null });
+    set({ loading: true, failure: null });
 
     try {
-      const response = await fetch(URL);
-      const json = await response.json();
-      const data = json.results;
-
-      const promises = data.map(async (pokemon: { url: string }) => {
-        const response = await fetch(pokemon.url);
-        const json = await response.json();
-
-        const types = json.types.map((type: { type: { name: string } }) => {
-          return type.type.name as keyof typeof PokemonType;
-        });
-
-        // Add base stats
-        const stats = json.stats.map((stat: any) => ({
-          name: stat.stat.name, // gets hp, attack, defense, etc
-          value: stat.base_stat,
-        }));
-
-        return {
-          id: json.id,
-          name: json.name,
-          height: json.height,
-          weight: json.weight,
-          types,
-          base_experience: json.base_experience,
-          stats,
-        };
-      });
-
-      const pokemon = await Promise.all(promises);
+      const pokemon = await fetchAllPokemon();
       const current = pokemon[0];
-
       set({ current, pokemon });
     } catch (error) {
       console.error(error);
-      set({ failureAll: "Failed to load Pokémon" });
+      set({ failure: "Failed to load Pokémon" });
     } finally {
-      set({ loadingAll: false });
+      set({ loading: false });
     }
   },
 }));
