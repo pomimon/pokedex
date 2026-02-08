@@ -13,10 +13,9 @@ export const ModalDetails = () => {
   const previous = usePokemonStore((s) => s.previousPokemon);
 
   const flavorText = usePokemonStore((s) => s.flavorText);
-  const loadingSpecies = usePokemonStore((s) => s.loadingSpecies);
+  const loadingSpecies = usePokemonStore((s) => s.loading);
 
   const evolutions = usePokemonStore((s) => s.evolutions);
-  const loadingEvolution = usePokemonStore((s) => s.loadingEvolution);
   const openModal = usePokemonStore((s) => s.openModal);
 
   // Keyboard navigation

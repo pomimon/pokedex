@@ -9,11 +9,10 @@ import { usePokemonStore } from "@/store";
 export const App = () => {
   const fetch = usePokemonStore((store) => store.fetch);
 
-  const current = usePokemonStore((store) => store.current);
   const pokemon = usePokemonStore((store) => store.pokemon);
 
-  const loadingAll = usePokemonStore((store) => store.loadingAll);
-  const failureAll = usePokemonStore((store) => store.failureAll);
+  const loadingAll = usePokemonStore((store) => store.loading);
+  const failureAll = usePokemonStore((store) => store.failure);
 
   const modalOpen = usePokemonStore((store) => store.modalOpen);
   const closeModal = usePokemonStore((store) => store.closeModal);
