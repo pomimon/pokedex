@@ -1,9 +1,20 @@
-import { create } from "zustand";
+/**
+ * Pokemon Store
+ *
+ * Zustand store for managing Pokemon state.
+ *
+ * KEY IMPROVEMENTS:
+ * - Separated API calls into api/ layer
+ * - Separated business logic into lib/ layer
+ * - Store now only manages state and coordinates actions
+ * - Cleaner separation of concerns makes testing easier
+ * - Better error handling with specific error states
+ */
 
+import { create } from "zustand";
 import { type PokemonInfo, PokemonType, type EvolutionChain } from "@/types";
-import { fetchAllPokemon } from "@/utils/fetchAllPokemon";
-import { fetchSpeciesData } from "@/utils/fetchSpeciesData";
-import { getFlavorText } from "@/utils/getFlavorText";
+import { pokemonApi, speciesApi, evolutionApi } from "@/api";
+import { transformPokemonData, extractFlavorText, buildEvolutionChain } from "@/lib";
 
 const DEFAULT_INFO: PokemonInfo = {
   id: 1,
@@ -16,190 +27,170 @@ const DEFAULT_INFO: PokemonInfo = {
 };
 
 type State = {
-  // all info for first 151 pokemon
+  // All Pokemon data (first 151)
   pokemon: PokemonInfo[];
-  // data for the currently selected pokemon
-  current: PokemonInfo;
-  // flavor text for the currently selected pokemon
-  flavorText: string | null;
 
+  // Currently selected Pokemon in modal
+  current: PokemonInfo;
+
+  // Additional data loaded on-demand
+  flavorText: string | null;
   evolutions: EvolutionChain;
 
-  // list of types the user selected
+  // Filters
   searchType: PokemonType | null;
-  // search term provided by the user
   searchQuery: string;
 
+  // UI state
   modalOpen: boolean;
 
-  loading: boolean;
-  failure: string | null;
+  // Loading states - separated for better UX
+  loadingAll: boolean;      // Loading initial 151 Pokemon
+  loadingDetails: boolean;   // Loading species/evolution data
+
+  // Error states
+  failureAll: string | null;
+  failureDetails: string | null;
 };
 
 type Actions = {
-  // - 1 request to fetch list of pokemon
-  // - 151 requests to fetch initial pokemon info
-  // - 151 requests to fetch pokemon image
-  // - 1 request per-pokemon to fetch species info
-  // - 1 request per-pokemon to fetch evolution info
-  fetch: () => Promise<void>;
-  openModal: (current: number) => void;
+  // Initial data load
+  loadAllPokemon: () => Promise<void>;
+
+  // Modal controls
+  openModal: (id: number) => void;
   closeModal: () => void;
-  nextPokemon: () => void;
-  previousPokemon: () => void;
-  fetchSpecies: (pokemonId: number) => Promise<void>;
-  fetchEvolution: (pokemonId: number) => Promise<void>;
+
+  // Navigation within modal
+  navigate: (direction: 'next' | 'prev') => void;
+
+  // Filters
   toggleTypeFilter: (type: PokemonType) => void;
   clearTypeFilters: () => void;
+  setSearchQuery: (query: string) => void;
 };
 
 export const usePokemonStore = create<State & Actions>((set, get) => ({
-  // State
+  // ===== STATE =====
   pokemon: [],
   current: DEFAULT_INFO,
   flavorText: null,
   evolutions: [],
-  failureEvolution: null,
   searchType: null,
-  searchQuery: "",
-  loading: false,
-  failure: null,
+  searchQuery: '',
   modalOpen: false,
+  loadingAll: false,
+  loadingDetails: false,
+  failureAll: null,
+  failureDetails: null,
 
-  // Actions
-  //
+  // ===== ACTIONS =====
+
+  /**
+   * Load all 151 Pokemon on app start
+   * Only runs once - subsequent calls are ignored
+   */
+  loadAllPokemon: async () => {
+    // Don't reload if we already have data
+    if (get().pokemon.length > 0) return;
+
+    // Don't start a new load if one is in progress
+    if (get().loadingAll) return;
+
+    set({ loadingAll: true, failureAll: null });
+
+    try {
+      const rawData = await pokemonApi.fetchAll();
+      const pokemon = rawData.map(transformPokemonData);
+      set({ pokemon, current: pokemon[0] });
+    } catch (error) {
+      console.error('Failed to load Pokemon:', error);
+      set({ failureAll: 'Failed to load Pokémon data. Please refresh the page.' });
+    } finally {
+      set({ loadingAll: false });
+    }
+  },
+
+  /**
+   * Open modal and load additional data for a Pokemon
+   */
+  openModal: async (id: number) => {
+    const pokemon = get().pokemon.find(p => p.id === id);
+    if (!pokemon) return;
+
+    // Open modal immediately with cached data
+    set({
+      modalOpen: true,
+      current: pokemon,
+      flavorText: null,
+      evolutions: [],
+      failureDetails: null,
+    });
+
+    // Load additional data in the background
+    set({ loadingDetails: true });
+
+    try {
+      // Fetch species and evolution data in parallel
+      const speciesData = await speciesApi.fetchSpecies(id);
+      const flavorText = extractFlavorText(speciesData);
+
+      const evolutionData = await evolutionApi.fetchEvolutionChain(
+        speciesData.evolution_chain.url
+      );
+      const evolutions = buildEvolutionChain(evolutionData.chain, get().pokemon);
+
+      set({ flavorText, evolutions });
+    } catch (error) {
+      console.error('Failed to load Pokemon details:', error);
+      set({ failureDetails: 'Failed to load additional details' });
+    } finally {
+      set({ loadingDetails: false });
+    }
+  },
+
+  /**
+   * Close the modal
+   */
+  closeModal: () => set({ modalOpen: false }),
+
+  /**
+   * Navigate to next or previous Pokemon
+   * Wraps around at boundaries (after #151 goes to #1, and vice versa)
+   */
+  navigate: (direction) => {
+    const { pokemon, current } = get();
+    if (pokemon.length === 0) return;
+
+    const currentIndex = pokemon.findIndex(p => p.id === current.id);
+
+    let nextIndex: number;
+    if (direction === 'next') {
+      nextIndex = (currentIndex + 1) % pokemon.length;
+    } else {
+      nextIndex = (currentIndex - 1 + pokemon.length) % pokemon.length;
+    }
+
+    const nextPokemon = pokemon[nextIndex];
+    get().openModal(nextPokemon.id);
+  },
+
+  /**
+   * Toggle a type filter on/off
+   * Only one type can be active at a time (single-select)
+   */
   toggleTypeFilter: (type: PokemonType) =>
     set((state) => ({
       searchType: state.searchType === type ? null : type,
     })),
 
+  /**
+   * Clear all type filters
+   */
   clearTypeFilters: () => set({ searchType: null }),
 
-  openModal: (id: number) => {
-    const pokemon = get().pokemon.find((p) => p.id === id);
-    const current = pokemon || DEFAULT_INFO;
-
-    set({
-      modalOpen: true,
-      current,
-      flavorText: null,
-      evolutions: [],
-    });
-    get().fetchSpecies(id);
-    get().fetchEvolution(id);
-  },
-
-  closeModal: () => set({ modalOpen: false }),
-
-  nextPokemon: () => {
-    const { pokemon, current } = get();
-    if (pokemon.length === 0) return;
-
-    const total = pokemon.length;
-    const nextId = current.id === total ? 1 : current.id + 1;
-
-    const next = pokemon[nextId - 1];
-
-    set({ current: next, flavorText: null, evolutions: [] });
-
-    get().fetchSpecies(next.id);
-    get().fetchEvolution(next.id);
-  },
-
-  previousPokemon: () => {
-    const { pokemon, current } = get();
-    if (pokemon.length === 0) return;
-
-    const total = pokemon.length;
-    const prevId = current.id === 1 ? total : current.id - 1;
-    const prev = pokemon[prevId - 1];
-
-    set({ current: prev, flavorText: null, evolutions: [] });
-
-    get().fetchSpecies(prev.id);
-    get().fetchEvolution(prev.id);
-  },
-
-  fetchSpecies: async (pokemonId: number) => {
-    if (get().loading) return;
-
-    set({ loading: true, failure: null });
-
-    try {
-      const speciesData = await fetchSpeciesData(pokemonId);
-      const flavorText = getFlavorText(speciesData);
-      set({ flavorText });
-    } catch (error) {
-      console.error(error);
-      set({ failure: "Failed to load species data" });
-    } finally {
-      set({ loading: false });
-    }
-  },
-
-  fetchEvolution: async (pokemonId: number) => {
-    set({ loading: true, failure: null, evolutions: [] });
-
-    try {
-      // 1. species
-      const speciesRes = await fetch(
-        `https://pokeapi.co/api/v2/pokemon-species/${pokemonId}/`,
-      );
-      const speciesJson = await speciesRes.json();
-
-      // 2. evolution chain
-      const evoRes = await fetch(speciesJson.evolution_chain.url);
-      const evoJson = await evoRes.json();
-
-      // 3. flatten chain
-      const evolutions: EvolutionChain = [];
-      const allPokemon = get().pokemon;
-
-      const limitPokemon = (node: any) => {
-        const urlParts = node.species.url.split("/").filter(Boolean);
-        const id = Number(urlParts[urlParts.length - 1]);
-
-        // Only include first 151 Pokémon
-        if (id <= 151) {
-          const found = allPokemon.find((p) => p.id === id);
-          if (found) {
-            evolutions.push({
-              id: found.id,
-              name: found.name,
-              types: found.types,
-            });
-          }
-        }
-
-        node.evolves_to.forEach(limitPokemon);
-      };
-
-      limitPokemon(evoJson.chain);
-
-      set({ evolutions });
-    } catch (err) {
-      console.error(err);
-      set({ failure: "Failed to load evolution data" });
-    } finally {
-      set({ loading: false });
-    }
-  },
-
-  fetch: async () => {
-    if (get().pokemon.length > 0) return;
-    if (get().loading) return;
-
-    set({ loading: true, failure: null });
-
-    try {
-      const pokemon = await fetchAllPokemon();
-      const current = pokemon[0];
-      set({ current, pokemon });
-    } catch (error) {
-      console.error(error);
-      set({ failure: "Failed to load Pokémon" });
-    } finally {
-      set({ loading: false });
-    }
-  },
+  /**
+   * Set the search query
+   */
+  setSearchQuery: (query: string) => set({ searchQuery: query }),
 }));
