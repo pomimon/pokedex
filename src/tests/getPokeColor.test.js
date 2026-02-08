@@ -1,4 +1,4 @@
-import { getPokeColor } from "../utils";
+import { getPokeColor } from "../lib";
 
 test("get poke color from single types", () => {
   const result = getPokeColor(["electric"]);
