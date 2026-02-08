@@ -44,14 +44,11 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
       className={styles.overlay}
       onClick={handleOverlayClick}
       role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-title"
     >
       <div className={styles.content}>
         <button
           className={styles.close}
           onClick={onClose}
-          aria-label="Close modal"
         >
           ✕
         </button>

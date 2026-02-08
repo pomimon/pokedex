@@ -1,7 +1,7 @@
 import styles from "./style.module.css";
 import type { PokemonInfo, PokemonType } from "@/types";
 import { TypeBadge } from "@/components/TypeBadge";
-import { formatId, getSpriteUrl, getPokeColor } from "@/utils";
+import { formatId, getSpriteUrl, getPokeColor } from "@/lib";
 import { usePokemonStore } from "@/store";
 import { SpriteImage } from "@/components/SpriteImage";
 

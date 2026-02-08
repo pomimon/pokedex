@@ -1,5 +1,5 @@
 import styles from "./style.module.css";
-import { getTypeColor } from "@/utils";
+import { getTypeColor } from "@/lib";
 import { PokemonType } from "@/types";
 
 type TypeBadgeFormat = "button" | "pill";

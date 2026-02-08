@@ -1,4 +1,4 @@
-import { getSpriteUrl } from "@/utils";
+import { getSpriteUrl } from "@/lib";
 import styles from "./style.module.css";
 import type { PokemonInfo } from "@/types";
 

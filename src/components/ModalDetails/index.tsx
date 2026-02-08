@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 import type { PokemonInfo } from "@/types";
-import { capitalize, formatId, getPokeColor } from "@/utils";
+import { capitalize, formatId, getPokeColor } from "@/lib";
 import { TypeBadge } from "@/components/TypeBadge";
 import { SpriteImage } from "@/components/SpriteImage";
 import { usePokemonStore } from "@/store";
@@ -9,11 +9,10 @@ import styles from "./style.module.css";
 
 export const ModalDetails = () => {
   const pokemon = usePokemonStore((s) => s.current);
-  const next = usePokemonStore((s) => s.nextPokemon);
-  const previous = usePokemonStore((s) => s.previousPokemon);
+  const navigate = usePokemonStore((s) => s.navigate);
 
   const flavorText = usePokemonStore((s) => s.flavorText);
-  const loadingSpecies = usePokemonStore((s) => s.loading);
+  const loadingDetails = usePokemonStore((s) => s.loadingDetails);
 
   const evolutions = usePokemonStore((s) => s.evolutions);
   const openModal = usePokemonStore((s) => s.openModal);
@@ -23,16 +22,16 @@ export const ModalDetails = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") {
         e.preventDefault();
-        previous();
+        navigate('prev');
       } else if (e.key === "ArrowRight") {
         e.preventDefault();
-        next();
+        navigate('next');
       }
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [previous, next]);
+  }, [navigate]);
 
   const { typeColorA, typeColorB } = getPokeColor(pokemon.types);
 
@@ -58,16 +57,14 @@ export const ModalDetails = () => {
 
       <div className={styles.navigation}>
         <button
-          onClick={previous}
-          aria-label="Previous Pokémon (Left Arrow)"
+          onClick={() => navigate('prev')}
           title="Previous Pokémon"
         >
           <div className={styles.chevronLeft} />
         </button>
         <SpriteImage id={pokemon.id} name={pokemon.name} size={250} />
         <button
-          onClick={next}
-          aria-label="Next Pokémon (Right Arrow)"
+          onClick={() => navigate('next')}
           title="Next Pokémon"
         >
           <div className={styles.chevronRight} />
@@ -81,7 +78,7 @@ export const ModalDetails = () => {
       </div>
 
       <div className={styles.flavorText}>
-        {loadingSpecies ? <p>Loading...</p> : <p>{flavorText}</p>}
+        {loadingDetails ? <p>Loading...</p> : <p>{flavorText}</p>}
       </div>
 
       <div className={styles.stats}>
@@ -105,26 +102,28 @@ export const ModalDetails = () => {
         ))}
       </div>
 
-      {evolutions.length > 1 && (
+      {(loadingDetails || evolutions.length > 1) && (
         <div className={styles.evolutions}>
           <h3>Evolutions</h3>
 
-          <div className={styles.evolutionList}>
-            {evolutions.map((evo) => (
-              <button
-                key={evo.id}
-                className={styles.evolution}
-                onClick={() => openModal(evo.id)}
-                aria-label={`View ${capitalize(evo.name)}`}
-              >
-                <SpriteImage id={evo.id} name={evo.name} size={80} />
-
-                <span className={styles.evolutionName}>
-                  {capitalize(evo.name)}
-                </span>
-              </button>
-            ))}
-          </div>
+          {loadingDetails ? (
+            <p>Loading evolutions...</p>
+          ) : (
+            <div className={styles.evolutionList}>
+              {evolutions.map((evo) => (
+                <button
+                  key={evo.id}
+                  className={styles.evolution}
+                  onClick={() => openModal(evo.id)}
+                >
+                  <SpriteImage id={evo.id} name={evo.name} size={80} />
+                  <span className={styles.evolutionName}>
+                    {capitalize(evo.name)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -4,22 +4,20 @@ import { CardList } from "@/components/CardList";
 import { Modal } from "@/components/Modal";
 import { TypeFilter } from "@/components/TypeFilter";
 import { ModalDetails } from "@/components/ModalDetails";
+import { SearchBar } from "@/components/SearchBar";
 import { usePokemonStore } from "@/store";
 
 export const App = () => {
-  const fetch = usePokemonStore((store) => store.fetch);
-
+  const loadAllPokemon = usePokemonStore((store) => store.loadAllPokemon);
   const pokemon = usePokemonStore((store) => store.pokemon);
-
-  const loadingAll = usePokemonStore((store) => store.loading);
-  const failureAll = usePokemonStore((store) => store.failure);
-
+  const loadingAll = usePokemonStore((store) => store.loadingAll);
+  const failureAll = usePokemonStore((store) => store.failureAll);
   const modalOpen = usePokemonStore((store) => store.modalOpen);
   const closeModal = usePokemonStore((store) => store.closeModal);
 
   useEffect(() => {
-    fetch();
-  }, [fetch]);
+    loadAllPokemon();
+  }, [loadAllPokemon]);
 
   if (failureAll) {
     return (
@@ -43,6 +41,7 @@ export const App = () => {
       </header>
 
       <main>
+        <SearchBar />
         <TypeFilter />
         <CardList pokemon={pokemon} loading={loadingAll} />
       </main>
