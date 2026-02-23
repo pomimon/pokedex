@@ -8,7 +8,7 @@ export const SearchBar = () => {
 
   return (
     <div className={styles.container}>
-      <img src ={pokeball} alt="pokeball" className={styles.icon}>
+      <img src ={pokeball} alt="pokeball" className={styles.icon}/>
       <input
         type="text"
         className={styles.input}
