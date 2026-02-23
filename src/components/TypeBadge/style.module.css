@@ -1,7 +1,8 @@
 .badge {
   color: white;
   display: inline-block;
-  font-size: 0.85rem;
+  font-size: 1.15rem;
+  font-family: Iceland;
   font-weight: bold;
   padding: 0.25rem 0.75rem;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
