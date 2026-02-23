@@ -12,6 +12,7 @@ export const pokemonApi = {
    * Fetch the list of Pokemon (just names and URLs)
    */
   async fetchList(limit = 151, offset = 0) {
+    // return await P.getPokemonsList({ limit, offset })
     const response = await fetch(`${BASE_URL}/pokemon?limit=${limit}&offset=${offset}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch pokemon list: ${response.statusText}`);
