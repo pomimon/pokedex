@@ -15,6 +15,7 @@ export const speciesApi = {
    * This includes flavor text and evolution chain URL
    */
   async fetchSpecies(pokemonId: number) {
+    // return await P.getPokemonSpeciesByName(pokemonId)
     const response = await fetch(`${BASE_URL}/pokemon-species/${pokemonId}/`);
     if (!response.ok) {
       throw new Error(`Failed to fetch species data: ${response.statusText}`);
